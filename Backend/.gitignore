@@ -12,3 +12,4 @@ src/__pycache__
 src/env.py
 venv
 *.db
+.env
