@@ -127,19 +127,3 @@ def get_resume(link):
         "languages": languages
     }
     return resume
-
-
-# if __name__ == "__main__":
-#     cnt = 0
-#     for a in get_resume_links("SQL", 0):
-#         for key, value in get_resume(a).items():
-#             print("{0}: {1}".format(key,value))
-#         print('')
-#         cnt += 1
-#     print(cnt)
-
-# if __name__ == "__main__":
-#     for item in get_vacancy_data("python"):
-#             for key, value in get_vacancy(item).items():
-#                 print("{0}: {1}".format(key,value))
-#             print('')

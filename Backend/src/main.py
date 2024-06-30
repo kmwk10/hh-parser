@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+import psycopg2
+from env import DB_HOST, DB_PASS, DB_USER, DB_NAME, DB_PORT
 from pydantic import BaseModel
-from src.db import create_tables, update_vacancies_table, update_resumes_table
-from src.parsing import get_vacancy_data, get_vacancy, get_resume_links, get_resume
+from db import create_tables, update_vacancies_table, update_resumes_table, get_vacancies_by_params, get_resumes_by_params
+from parsing import get_vacancy_data, get_vacancy, get_resume_links, get_resume
 
 app = FastAPI()
 
@@ -10,11 +12,11 @@ def root():
     try:
         create_tables()
         return "Таблица создалась"
-    except:
-        return "Ошибка"
+    except Exception as e:
+        return f"{e}"
 
 @app.get("/vacancies")
-def gat_vacancies(text: str, count: int):
+def get_vacancies(text: str, count: int = 0):
     try:
         data = []
         for item in get_vacancy_data(text, count):
@@ -26,7 +28,7 @@ def gat_vacancies(text: str, count: int):
         return f"{e}"
 
 @app.get("/resumes")
-def gat_resumes(text: str, count: int):
+def get_resumes(text: str, count: int = 0):
     try:
         data = []
         for link in get_resume_links(text, count):
@@ -36,3 +38,20 @@ def gat_resumes(text: str, count: int):
         return data
     except Exception as e:
         return f"{e}"
+
+@app.get("/vacancies/data")
+def get_vacancies_data(name: str | None = None, area: str | None = None, employment: int | None = None, schedule: int | None = None):
+    try:
+        data = get_vacancies_by_params(name, area, employment, schedule)
+        return data
+    except Exception as e:
+        return f"{e}"
+
+@app.get("/resumes/data")
+def get_resumes_data(name: str | None = None, gender: int | None = None, employment: int | None = None, schedule: int | None = None, skills: str | None = None):
+    try:
+        data = get_resumes_by_params(name, gender, employment, schedule, skills)
+        return data
+    except Exception as e:
+        return f"{e}"
+
