@@ -1,11 +1,24 @@
 from fastapi import FastAPI
-import psycopg2
+from fastapi.middleware.cors import CORSMiddleware
 from env import DB_HOST, DB_PASS, DB_USER, DB_NAME, DB_PORT
 from pydantic import BaseModel
 from db import create_tables, update_vacancies_table, update_resumes_table, get_vacancies_by_params, get_resumes_by_params
 from parsing import get_vacancy_data, get_vacancy, get_resume_links, get_resume
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1м :5173"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():
