@@ -148,7 +148,6 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
 
     select = "SELECT * FROM resumes"
     params = []
-
     employment = ["Полная занятость", "Частичная занятость", "Стажировка", "Проектная работа", "Волонтерство"]
     schedule =["Полный день", "Удаленная работа", "Сменный график", "Гибкий график", "Вахтовый метод"]
     genders = ['Мужчина', 'Женщина']
@@ -167,7 +166,7 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
         select += " schedule ILIKE %s AND"
         params.append('%'+schedule[sch]+'%')
     if skills:
-        skills = skills.split(", ")
+        skills = skills.replace(" ", "").split(",")
         for skill in skills:
             select += " %s ILIKE ANY(skills) AND"
             params.append(skill)
