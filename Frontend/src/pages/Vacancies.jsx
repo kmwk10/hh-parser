@@ -42,7 +42,6 @@ function Vacancies() {
         } else {
           setStat('success')
         }
-        console.log(data)
         setProg(false);
       })
       .catch((error) => {
@@ -69,7 +68,7 @@ function Vacancies() {
   const vacanciesCards = vacancies.map((vac) => (
     <Card align='flex-start' w='100%' marginBottom='1rem' key={vac['id']}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/vacancy/'+vac["id"]} isExternal><Text fontSize='2xl'>{vac["name"]}</Text></ChakraLink>
+        <ChakraLink href={'https://hh.ru/vacancy/'+vac["id"]} isExternal><Text fontSize='2xl' textAlign='left'>{vac["name"]}</Text></ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
         <Text as='b'>{vac["salary"]}</Text>
@@ -96,13 +95,13 @@ function Vacancies() {
             <Image src={arrow} boxSize='1rem' margin='1rem 0 0 2rem'/>
             <ChakraLink as={ReactRouterLink} to='/data' fontSize='l' marginTop='1rem'>База данныx по вакансиям</ChakraLink>
           </Flex>
-          <Input placeholder='Поиск по вакансиям' margin='1rem 0'  onChange={e => setText(e.target.value)} onKeyDown={handleKeyDown}/>
+          <Input placeholder='Поиск по вакансиям' margin='1rem 0' onChange={e => setText(e.target.value)} onKeyDown={handleKeyDown}/>
         </Flex>
         <Flex direction='column'>
             {vacanciesCards}
         </Flex>
         {vacancies.length!=0 ? 
-        <Button marginBottom='1rem' onClick={addVacancies}>Загрузить ещё</Button>
+        <Button marginBottom='1rem' onClick={addVacancies}>Найти ещё</Button>
         : 
         <></>
         }
@@ -111,19 +110,19 @@ function Vacancies() {
         <CircularProgress isIndeterminate marginBottom='1rem' zIndex={2} pos="fixed" right='2rem' top='2rem'/>
       :
       stat=='success' ? 
-        <Alert status='success' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='success' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           Найденные вакансии загружены в базу данныx!
         </Alert>
       :
       stat=="error" ?
-        <Alert status='error' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='error' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           При обработке вашего запроса произошла ошибка!
         </Alert>
       :
       stat=="nothing" ?
-        <Alert status='info' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='info' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           По вашему запросу ничего не найдено!
         </Alert>

@@ -31,7 +31,6 @@ function Resumes() {
         } else {
           setStat('success')
         }
-        console.log(data)
         setProg(false);
       })
       .catch((error) => {
@@ -58,7 +57,7 @@ function Resumes() {
   const resumesCards = resumes.map((res) => (
     <Card align='flex-start' w='100%' marginBottom='1rem' key={res['id']}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/resumes/'+res["id"]} isExternal><Text fontSize='2xl'>{res["name"]}</Text></ChakraLink>
+        <ChakraLink href={'https://hh.ru/resume/'+res["id"]} isExternal><Text fontSize='2xl' textAlign='left'>{res["name"]}</Text></ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
         <Text as='b'>{res["salary"]}</Text>
@@ -102,7 +101,7 @@ function Resumes() {
           {resumesCards}
         </Flex>
         {resumes.length!=0 ? 
-        <Button marginBottom='1rem' onClick={addResumes}>Загрузить ещё</Button>
+        <Button marginBottom='1rem' onClick={addResumes}>Найти ещё</Button>
         : 
         <></>
         }
@@ -111,19 +110,19 @@ function Resumes() {
         <CircularProgress isIndeterminate marginBottom='1rem' zIndex={2} pos="fixed" right='2rem' top='2rem'/>
       :
       stat=='success' ? 
-        <Alert status='success' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='success' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           Найденные резюме загружены в базу данныx!
         </Alert>
       :
       stat=="error" ?
-        <Alert status='error' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='error' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           При обработке вашего запроса произошла ошибка!
         </Alert>
       :
       stat=="nothing" ?
-        <Alert status='info' zIndex={2} pos="fixed" w='28vw' right='2rem' top='2rem'>
+        <Alert status='info' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           По вашему запросу ничего не найдено!
         </Alert>
