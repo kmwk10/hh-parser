@@ -23,12 +23,35 @@ app.add_middleware(
 def root():
     try:
         create_tables()
-        return "Таблица создалась"
+        return {"status": 200}
     except Exception as e:
         return f"{e}"
 
+class Vacancy(BaseModel):
+    id: str
+    name: str
+    salary: str
+    area: str
+    employment: str
+    schedule: str
+    experience: str
+    requirement: str
+    employer: str
+
+class Resume(BaseModel):
+    id: str
+    name: str
+    gender: str
+    age: str
+    salary: str
+    employment: str
+    schedule: str
+    experience: str
+    skills: list[str]
+    languages: list[str]
+
 @app.get("/vacancies")
-def get_vacancies(text: str, count: int = 0):
+def get_vacancies(text: str, count: int = 0) -> list[Vacancy]:
     try:
         data = []
         for item in get_vacancy_data(text, count):
@@ -40,7 +63,7 @@ def get_vacancies(text: str, count: int = 0):
         return f"{e}"
 
 @app.get("/resumes")
-def get_resumes(text: str, count: int = 0):
+def get_resumes(text: str, count: int = 0) -> list[Resume]:
     try:
         data = []
         for link in get_resume_links(text, count):
@@ -52,7 +75,7 @@ def get_resumes(text: str, count: int = 0):
         return f"{e}"
 
 @app.get("/vacancies/data")
-def get_vacancies_data(name: str | None = None, area: str | None = None, employment: int | None = None, schedule: int | None = None):
+def get_vacancies_data(name: str | None = None, area: str | None = None, employment: int | None = None, schedule: int | None = None) -> list[Vacancy]:
     try:
         data = get_vacancies_by_params(name, area, employment, schedule)
         return data
@@ -60,7 +83,7 @@ def get_vacancies_data(name: str | None = None, area: str | None = None, employm
         return f"{e}"
 
 @app.get("/resumes/data")
-def get_resumes_data(name: str | None = None, gender: int | None = None, employment: int | None = None, schedule: int | None = None, skills: str | None = None):
+def get_resumes_data(name: str | None = None, gender: int | None = None, employment: int | None = None, schedule: int | None = None, skills: str | None = None) -> list[Resume]:
     try:
         data = get_resumes_by_params(name, gender, employment, schedule, skills)
         return data
