@@ -31,6 +31,7 @@ function Vacancies() {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         if (prevText == text) {
           const newVac = [...vacancies, ...data]
           setVacancies(newVac);

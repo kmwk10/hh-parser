@@ -1,6 +1,5 @@
 import psycopg2
-from parsing import get_vacancy_data, get_vacancy, get_resume_links, get_resume
-from env import DB_HOST, DB_PASS, DB_USER, DB_NAME, DB_PORT
+from src.env import DB_HOST, DB_PASS, DB_USER, DB_NAME, DB_PORT
 
 def create_tables():
     conn = psycopg2.connect(
