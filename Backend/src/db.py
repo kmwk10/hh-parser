@@ -16,8 +16,8 @@ def create_tables():
             name VARCHAR(255),
             salary VARCHAR(255),
             area VARCHAR(255),
-            schedule VARCHAR(255),
             employment VARCHAR(255),
+            schedule VARCHAR(255),
             experience VARCHAR(255),
             requirement TEXT,
             employer VARCHAR(255)
@@ -51,20 +51,20 @@ def update_vacancies_table(vac):
     )
     cur = conn.cursor()
     cur.execute("""
-                INSERT INTO vacancies (vacancies_id, name, salary, area, schedule, employment, experience, requirement, employer)
+                INSERT INTO vacancies (vacancies_id, name, salary, area, employment, schedule, experience, requirement, employer)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (vacancies_id) DO UPDATE 
                     SET name = excluded.name, 
                         salary = excluded.salary,
                         area = excluded.area,
-                        schedule = excluded.schedule,
                         employment = excluded.employment,
+                        schedule = excluded.schedule,
                         experience = excluded.experience,
                         requirement = excluded.requirement,  
                         employer = excluded.employer;
                 
                 """,
-                (vac["id"], vac["name"], vac["salary"], vac["area"], vac["schedule"], vac["employment"], vac["experience"], vac["requirement"], vac["employer"])
+                (vac["id"], vac["name"], vac["salary"], vac["area"], vac["employment"], vac["schedule"], vac["experience"], vac["requirement"], vac["employer"])
             )
     conn.commit()  
     cur.close()
@@ -130,7 +130,20 @@ def get_vacancies_by_params(name, area, emp, sch):
     if name or area or emp or sch:
         select = select[:-4]
     cur.execute(select, params)
-    data = cur.fetchall()
+    fetch = cur.fetchall()
+    data = []
+    for row in fetch:
+        data.append({
+            "id": row[0],
+            "name": row[1],
+            "salary": row[2],
+            "area": row[3],
+            "employment": row[4],
+            "schedule": row[5],
+            "experience": row[6],
+            "requirement": row[7],
+            "employer": row[8]
+        })
     cur.close()
     conn.close()
     return data
@@ -172,7 +185,21 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
     if name or gender or emp or sch or skills:
         select = select[:-4]
     cur.execute(select, params)
-    data = cur.fetchall()
+    fetch = cur.fetchall()
+    data = []
+    for row in fetch:
+        data.append({
+            "id": row[0],
+            "name": row[1],
+            "gender": row[2],
+            "age": row[3],
+            "salary": row[4],
+            "employment": row[5],
+            "schedule": row[6],
+            "experience": row[7],
+            "skills": row[8],
+            "languages": row[9]
+        })
     cur.close()
     conn.close()
     return data

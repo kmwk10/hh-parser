@@ -54,26 +54,26 @@ function ResumesData() {
   }
 
   const resDataCards = resData.map((res) => (
-    <Card align='flex-start' w='100%' marginBottom='1rem' key={res[0]}>
+    <Card align='flex-start' w='100%' marginBottom='1rem' key={res['id']}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/resume/'+res[0]} isExternal><Text fontSize='2xl'>{res[1]}</Text></ChakraLink>
+        <ChakraLink href={'https://hh.ru/resume/'+res['id']} isExternal><Text fontSize='2xl'>{res["name"]}</Text></ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
-        <Text as='b'>{res[4]}</Text>
-        <Text>{res[2]}</Text>
-        <Text>{res[3]}</Text>
-        <Text>Опыт работы: {res[7]}</Text>
-        <Text>{res[5][0].toUpperCase() + res[5].slice(1)}</Text>
-        <Text>{res[6][0].toUpperCase() + res[6].slice(1)}</Text>
+        <Text as='b'>{res["salary"]}</Text>
+        <Text>{res["gender"]}</Text>
+        <Text>{res["age"]}</Text>
+        <Text>Опыт работы: {res["experience"]}</Text>
+        <Text>{res["employment"][0].toUpperCase() + res["employment"].slice(1)}</Text>
+        <Text>{res["schedule"][0].toUpperCase() + res["schedule"].slice(1)}</Text>
         <Box>
-          {res[8].length!=0 ? <Text>Навыки: </Text> : <></>}
-          {res[8].map((item) => (
+          {res["skills"].length!=0 ? <Text>Навыки: </Text> : <></>}
+          {res["skills"].map((item) => (
             <Tag key={item} margin='0.2rem 1rem 0.2rem 0'>{item}</Tag>
           ))}
         </Box>
         <Box>
-          {res[9].length!=0 ? <Text>Знание языков: </Text> : <></>}
-          {res[9].map((item) => (
+          {res["languages"].length!=0 ? <Text>Знание языков: </Text> : <></>}
+          {res["languages"].map((item) => (
             <Tag key={item} margin='0.2rem 1rem 0.2rem 0'>{item}</Tag>
           ))}
         </Box>

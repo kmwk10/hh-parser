@@ -51,18 +51,18 @@ function VacanciesData() {
   }
 
   const vacDataCards = vacData.map((vac) => (
-    <Card align='flex-start' w='100%' marginBottom='1rem' key={vac[0]}>
+    <Card align='flex-start' w='100%' marginBottom='1rem' key={vac["id"]}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/vacancy/'+vac[0]} isExternal><Text fontSize='2xl'>{vac[1]}</Text></ChakraLink>
+        <ChakraLink href={'https://hh.ru/vacancy/'+vac["id"]} isExternal><Text fontSize='2xl'>{vac["name"]}</Text></ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
-        <Text as='b'>{vac[2]}</Text>
-        <Text>{vac[8]}</Text>
-        <Text>{vac[3]}</Text>
-        <Tag margin='0.2rem 1rem 0.2rem 0'>{vac[6]}</Tag>
-        <Tag margin='0.2rem 1rem 0.2rem 0'>{vac[5]}</Tag>
-        <Tag margin='0.2rem 0'>{vac[4]}</Tag>
-        <Text>{vac[7]}</Text>
+        <Text as='b'>{vac["salary"]}</Text>
+        <Text>{vac["employer"]}</Text>
+        <Text>{vac["area"]}</Text>
+        <Tag margin='0.2rem 1rem 0.2rem 0'>{vac["experience"]}</Tag>
+        <Tag margin='0.2rem 1rem 0.2rem 0'>{vac["employment"]}</Tag>
+        <Tag margin='0.2rem 0'>{vac["schedule"]}</Tag>
+        <Text>{vac["requirement"]}</Text>
       </CardBody>
     </Card>
   ));
