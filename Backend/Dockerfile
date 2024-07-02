@@ -10,11 +10,11 @@ ARG PYTHON_VERSION=3.11.5
 FROM python:${PYTHON_VERSION}-slim AS base
 
 # Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
+# ENV PYTHONDONTWRITEBYTECODE=1
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
+# ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
@@ -38,14 +38,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
+RUN apt-get update && apt-get install -y libpq5
 # Switch to the non-privileged user to run the application.
 USER appuser
 
 # Copy the source code into the container.
-COPY . .
+# COPY . .
 
 # Expose the port that the application listens on.
 EXPOSE 8000
 
 # Run the application.
-CMD gunicorn -k uvicorn.workers.UvicornWorker src.main:app --bind=0.0.0.0:8000
+CMD gunicorn -k uvicorn.workers.UvicornWorker src.main:app --bind=0.0.0.0:8000 --reload
