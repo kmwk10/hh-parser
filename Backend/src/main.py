@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from src.db import create_tables, update_vacancies_table, update_resumes_table, get_vacancies_by_params, get_resumes_by_params
@@ -18,14 +18,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/")
-def root():
-    try:
-        create_tables()
-        return {"status": 200}
-    except Exception as e:
-        return f"{e}"
 
 class Vacancy(BaseModel):
     id: str
@@ -50,6 +42,14 @@ class Resume(BaseModel):
     skills: list[str]
     languages: list[str]
 
+@app.get("/")
+def root():
+    try:
+        create_tables()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"status_code": 200}
+
 @app.get("/vacancies")
 def get_vacancies(text: str, count: int = 0) -> list[Vacancy]:
     try:
@@ -58,9 +58,9 @@ def get_vacancies(text: str, count: int = 0) -> list[Vacancy]:
             vacancy = get_vacancy(item)
             data.append(vacancy)
             update_vacancies_table(vacancy)
-        return data
     except Exception as e:
-        return f"{e}"
+        raise HTTPException(status_code=500, detail=str(e))
+    return data
 
 @app.get("/resumes")
 def get_resumes(text: str, count: int = 0) -> list[Resume]:
@@ -70,23 +70,23 @@ def get_resumes(text: str, count: int = 0) -> list[Resume]:
             resume = get_resume(link)
             data.append(resume)
             update_resumes_table(resume)
-        return data
     except Exception as e:
-        return f"{e}"
+        raise HTTPException(status_code=500, detail=str(e))
+    return data
 
 @app.get("/vacancies/data")
 def get_vacancies_data(name: str | None = None, area: str | None = None, employment: int | None = None, schedule: int | None = None) -> list[Vacancy]:
     try:
         data = get_vacancies_by_params(name, area, employment, schedule)
-        return data
     except Exception as e:
-        return f"{e}"
+        raise HTTPException(status_code=500, detail=str(e))
+    return data
 
 @app.get("/resumes/data")
 def get_resumes_data(name: str | None = None, gender: int | None = None, employment: int | None = None, schedule: int | None = None, skills: str | None = None) -> list[Resume]:
     try:
         data = get_resumes_by_params(name, gender, employment, schedule, skills)
-        return data
     except Exception as e:
-        return f"{e}"
+        raise HTTPException(status_code=500, detail=str(e))
+    return data
 
