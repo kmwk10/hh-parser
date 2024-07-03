@@ -23,6 +23,7 @@ function Vacancies() {
   }, []);
 
   function getVacancies(count) {
+    console.log("http://127.0.0.1:8000/vacancies?text="+text+"&count="+count)
     fetch("http://127.0.0.1:8000/vacancies?text="+text+"&count="+count, {
       method: "GET",
       headers: {

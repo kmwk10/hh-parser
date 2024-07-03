@@ -25,4 +25,4 @@ EXPOSE 5173
 
 # Start app
 # CMD npm run dev
-ENTRYPOINT ls /app && npm install --include=dev && npm run dev
+ENTRYPOINT npm install --include=dev && npm run dev
