@@ -75,7 +75,7 @@ def get_resumes(text: str, count: int = 0) -> list[Resume]:
     return data
 
 @app.get("/vacancies/data")
-def get_vacancies_data(name: str | None = None, area: str | None = None, employment: int | None = None, schedule: int | None = None) -> list[Vacancy]:
+def get_vacancies_data(name: str | None = None, area: str | None = None, employment: str | None = None, schedule: str | None = None) -> list[Vacancy]:
     try:
         data = get_vacancies_by_params(name, area, employment, schedule)
     except Exception as e:
@@ -83,7 +83,7 @@ def get_vacancies_data(name: str | None = None, area: str | None = None, employm
     return data
 
 @app.get("/resumes/data")
-def get_resumes_data(name: str | None = None, gender: int | None = None, employment: int | None = None, schedule: int | None = None, skills: str | None = None) -> list[Resume]:
+def get_resumes_data(name: str | None = None, gender: int | None = None, employment: str | None = None, schedule: str | None = None, skills: str | None = None) -> list[Resume]:
     try:
         data = get_resumes_by_params(name, gender, employment, schedule, skills)
     except Exception as e:
