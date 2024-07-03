@@ -165,12 +165,11 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
         port=DB_PORT
     )
     cur = conn.cursor()
-
     select = "SELECT * FROM resumes"
     params = []
     employment = {"0": "Полная занятость", "1": "Частичная занятость", "2": "Стажировка", "3": "Проектная работа", "4": "Волонтерство"}
     schedule ={"0": "Полный день", "1": "Удаленная работа", "2": "Сменный график", "3": "Гибкий график", "4": "Вахтовый метод"}
-    genders = ['Мужчина', 'Женщина']
+    genders = {"0": 'Мужчина', "1": "Женщина"}
     if name or gender or emp or sch or skills:
         select += " WHERE"
     if name:

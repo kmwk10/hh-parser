@@ -1,4 +1,4 @@
-import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Radio, RadioGroup, Stack, Button, Image, Tag, CircularProgress, Alert, AlertIcon} from '@chakra-ui/react'
+import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Checkbox, CheckboxGroup, Stack, Button, Image, Tag, CircularProgress, Alert, AlertIcon} from '@chakra-ui/react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { useState } from 'react'
 import arrow from '../assets/arrow.svg'
@@ -6,8 +6,8 @@ import arrow from '../assets/arrow.svg'
 function VacanciesData() {
   const [name, setName] = useState('')
   const [area, setArea] = useState('')
-  const [employment, setEmployment] = useState('')
-  const [schedule, setSchedule] = useState('')
+  const [employment, setEmployment] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
+  const [schedule, setSchedule] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
   const [vacData, setVacData] = useState([])
   const [prog, setProg] = useState(false)
   const [stat, setStat] = useState('')
@@ -21,11 +21,23 @@ function VacanciesData() {
     if (area.length !=0) {
       url += "area="+area+'&'
     }
-    if (employment.length !=0) {
-      url += "employment="+employment+'&'
+    let strEmp = ''
+    for (let item in employment) {
+      if (employment[item]) {
+        strEmp += item
+      }
     }
-    if (schedule.length !=0) {
-      url += "schedule="+schedule+'&'
+    if (strEmp.length !=0) {
+      url += "employment="+strEmp+'&'
+    }
+    let strSch = ''
+    for (let item in schedule) {
+      if (schedule[item]) {
+        strSch += item
+      }
+    }
+    if (strSch.length !=0) {
+      url += "schedule="+strSch+'&'
     }
     fetch(url, {
       method: "GET",
@@ -48,6 +60,18 @@ function VacanciesData() {
         setStat('error')
       })
 
+  }
+
+  function updateEmployment(value) {
+    let newEmployment = employment;
+    newEmployment[value] = !newEmployment[value];
+    setEmployment(newEmployment);
+  }
+
+  function updateSchedule(value) {
+    let newSchedule = schedule;
+    newSchedule[value] = !newSchedule[value];
+    setSchedule(newSchedule);
   }
 
   const vacDataCards = vacData.map((vac) => (
@@ -93,27 +117,25 @@ function VacanciesData() {
               <Text>Регион</Text>
               <Input marginBottom='1rem' placeholder='Введите регион'size='sm' onChange={e => setArea(e.target.value)}/>
               <Text>Занятость</Text>
-              <RadioGroup onChange={setEmployment} value={employment}>
-                <Stack marginLeft='1rem'>
-                  <Radio size='sm' value='0'>Полная занятость</Radio>
-                  <Radio size='sm' value='1'>Частичная занятость</Radio>
-                  <Radio size='sm' value='2'>Стажировка</Radio>
-                  <Radio size='sm' value='3'>Проектная работа</Radio>
-                  <Radio size='sm' value='4'>Волонтерство</Radio>
+              <CheckboxGroup>
+                <Stack marginLeft='1rem' marginBottom="1rem">
+                  <Checkbox size='sm' onChange={() => updateEmployment('0')}>Полная занятость</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('1')}>Частичная занятость</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('2')}>Стажировка</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('3')}>Проектная работа</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('4')}>Волонтерство</Checkbox>
                 </Stack>
-              </RadioGroup>
-              <Button size='xs' onClick={() => setEmployment('')} margin='0.5rem 0 1rem 2rem'>Сбросить</Button>
+              </CheckboxGroup>
               <Text>График</Text>
-              <RadioGroup onChange={setSchedule} value={schedule}>
-                <Stack marginLeft='1rem'>
-                  <Radio size='sm' value='0'>Полный день</Radio>
-                  <Radio size='sm' value='1'>Удаленная работа</Radio>
-                  <Radio size='sm' value='2'>Сменный график</Radio>
-                  <Radio size='sm' value='3'>Гибкий график</Radio>
-                  <Radio size='sm' value='4'>Вахтовый метод</Radio>
+              <CheckboxGroup>
+                <Stack marginLeft='1rem' marginBottom="1rem">
+                  <Checkbox size='sm' onChange={() => updateSchedule('0')}>Полный день</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('1')}>Удаленная работа</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('2')}>Сменный график</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('3')}>Гибкий график</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('4')}>Вахтовый метод</Checkbox>
                 </Stack>
-              </RadioGroup>
-              <Button size='xs' onClick={() => setSchedule('')} margin='0.5rem 0 1.2rem 2rem'>Сбросить</Button>
+              </CheckboxGroup>
               <Flex>
                 <Button size='sm' onClick={getVacanciesData}>Показать результаты</Button>
               </Flex>

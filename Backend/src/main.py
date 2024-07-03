@@ -83,10 +83,9 @@ def get_vacancies_data(name: str | None = None, area: str | None = None, employm
     return data
 
 @app.get("/resumes/data")
-def get_resumes_data(name: str | None = None, gender: int | None = None, employment: str | None = None, schedule: str | None = None, skills: str | None = None) -> list[Resume]:
+def get_resumes_data(name: str | None = None, gender: str | None = None, employment: str | None = None, schedule: str | None = None, skills: str | None = None) -> list[Resume]:
     try:
         data = get_resumes_by_params(name, gender, employment, schedule, skills)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return data
-
