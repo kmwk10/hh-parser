@@ -111,8 +111,8 @@ def get_vacancies_by_params(name, area, emp, sch):
     cur = conn.cursor()
     select = "SELECT * FROM vacancies"
     params = []
-    employment = ["Полная занятость", "Частичная занятость", "Стажировка", "Проектная работа", "Волонтерство"]
-    schedule =["Полный день", "Удаленная работа", "Сменный график", "Гибкий график", "Вахтовый метод"]
+    employment = {"0": "Полная занятость", "1": "Частичная занятость", "2": "Стажировка", "3": "Проектная работа", "4": "Волонтерство"}
+    schedule ={"0": "Полный день", "1": "Удаленная работа", "2": "Сменный график", "3": "Гибкий график", "4": "Вахтовый метод"}
     if name or area or emp or sch:
         select += " WHERE"
     if name:
@@ -122,11 +122,19 @@ def get_vacancies_by_params(name, area, emp, sch):
         select += " area ILIKE %s AND"
         params.append(area)
     if emp:
-        select += " employment=%s AND"
-        params.append(employment[emp])
+        emp = list(emp)
+        select += " ("
+        for e in emp:
+            select += " employment=%s OR"
+            params.append(employment[e])
+        select = select[:-3] + ") AND"
     if sch:
-        select += " schedule=%s AND"
-        params.append(schedule[sch])
+        sch = list(sch)
+        select += " ("
+        for s in sch:
+            select += " schedule=%s OR"
+            params.append(schedule[s])
+        select = select[:-3] + ") AND"
     if name or area or emp or sch:
         select = select[:-4]
     cur.execute(select, params)
@@ -160,8 +168,8 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
 
     select = "SELECT * FROM resumes"
     params = []
-    employment = ["Полная занятость", "Частичная занятость", "Стажировка", "Проектная работа", "Волонтерство"]
-    schedule =["Полный день", "Удаленная работа", "Сменный график", "Гибкий график", "Вахтовый метод"]
+    employment = {"0": "Полная занятость", "1": "Частичная занятость", "2": "Стажировка", "3": "Проектная работа", "4": "Волонтерство"}
+    schedule ={"0": "Полный день", "1": "Удаленная работа", "2": "Сменный график", "3": "Гибкий график", "4": "Вахтовый метод"}
     genders = ['Мужчина', 'Женщина']
     if name or gender or emp or sch or skills:
         select += " WHERE"
@@ -172,11 +180,19 @@ def get_resumes_by_params(name, gender, emp, sch, skills):
         select += " gender ILIKE %s AND"
         params.append(genders[gender])
     if emp:
-        select += " employment ILIKE %s AND"
-        params.append('%'+employment[emp]+'%')
+        emp = list(emp)
+        select += " ("
+        for e in emp:
+            select += " employment ILIKE %s OR"
+            params.append('%'+employment[e]+'%')
+        select = select[:-3] + ") AND"
     if sch:
-        select += " schedule ILIKE %s AND"
-        params.append('%'+schedule[sch]+'%')
+        sch = list(sch)
+        select += " ("
+        for s in sch:
+            select += " schedule ILIKE %s OR"
+            params.append('%'+schedule[s]+'%')
+        select = select[:-3] + ") AND"
     if skills:
         skills = skills.replace(" ", "").split(",")
         for skill in skills:
