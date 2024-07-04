@@ -2,8 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 import fake_useragent
 
-def get_vacancy_data(text, page):
-    data = requests.get("https://api.hh.ru/vacancies", params={"page": page, "per_page": 20, "text": text})
+def get_vacancy_data(text, emp, sch, page):
+    employment = {"0": "full", "1": "part", "2": "probation", "3": "project", "4": "volunteer"}
+    schedule ={"0": "fullDay", "1": "remote", "2": "shift", "3": "flexible", "4": "flyInFlyOut"}
+
+    params = f'page={page}&per_page=20&text={text}'
+    if emp:
+        emp = list(emp)
+        for e in emp:
+            params += f'&employment={employment[e]}'
+    if sch:
+        sch = list(sch)
+        for s in sch:
+            params += f'&schedule={schedule[s]}'
+    data = requests.get("https://api.hh.ru/vacancies?"+params)
     if data:
         data = data.json()
         for item in data["items"]:
@@ -36,10 +48,23 @@ def get_vacancy(item):
     }
     return vacancy
 
-def get_resume_links(text, page):
+def get_resume_links(text, emp, sch, page):
+    employment = {"0": "full", "1": "part", "2": "probation", "3": "project", "4": "volunteer"}
+    schedule ={"0": "fullDay", "1": "remote", "2": "shift", "3": "flexible", "4": "flyInFlyOut"}
+
+    params = ''
+    if emp:
+        emp = list(emp)
+        for e in emp:
+            params += f'&employment={employment[e]}'
+    if sch:
+        sch = list(sch)
+        for s in sch:
+            params += f'&schedule={schedule[s]}'
+
     ua = fake_useragent.UserAgent()
     data = requests.get(
-        url=f"https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page=1",
+        url=f"https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page=1"+params,
         headers={"user-agent":ua.random}
     )
     if data.status_code != 200:
@@ -53,7 +78,7 @@ def get_resume_links(text, page):
         return "Error"
     try:
         data = requests.get(
-            url=f"https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page={page}&items_on_page=20",
+            url=f"https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page={page}&items_on_page=20"+params,
             headers={"user-agent":ua.random}
         )
         soup = BeautifulSoup(data.content, "lxml")

@@ -51,10 +51,10 @@ def root():
     return {"status_code": 200}
 
 @app.get("/vacancies")
-def get_vacancies(text: str, count: int = 0) -> list[Vacancy]:
+def get_vacancies(text: str, employment: str | None = None, schedule: str | None = None, count: int = 0) -> list[Vacancy]:
     try:
         data = []
-        for item in get_vacancy_data(text, count):
+        for item in get_vacancy_data(text, employment, schedule, count):
             vacancy = get_vacancy(item)
             data.append(vacancy)
             update_vacancies_table(vacancy)
@@ -63,10 +63,10 @@ def get_vacancies(text: str, count: int = 0) -> list[Vacancy]:
     return data
 
 @app.get("/resumes")
-def get_resumes(text: str, count: int = 0) -> list[Resume]:
+def get_resumes(text: str, employment: str | None = None, schedule: str | None = None, count: int = 0) -> list[Resume]:
     try:
         data = []
-        for link in get_resume_links(text, count):
+        for link in get_resume_links(text, employment, schedule, count):
             resume = get_resume(link)
             data.append(resume)
             update_resumes_table(resume)
