@@ -1,6 +1,6 @@
 import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Checkbox, CheckboxGroup, Stack, Button, Image, Tag, CircularProgress, Alert, AlertIcon} from '@chakra-ui/react'
 import { Link as ReactRouterLink } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import arrow from '../assets/arrow.svg'
 
 function VacanciesData() {
@@ -61,6 +61,10 @@ function VacanciesData() {
       })
 
   }
+
+  useEffect(() => {
+    getVacanciesData();
+  }, [])
 
   function updateEmployment(value) {
     let newEmployment = employment;

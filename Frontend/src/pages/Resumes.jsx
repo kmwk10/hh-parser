@@ -1,18 +1,38 @@
 import { useState } from 'react';
-import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Image, Tag, Alert, AlertIcon, Button, Box, CircularProgress} from '@chakra-ui/react'
+import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Checkbox, CheckboxGroup, Stack, Image, Tag, Alert, AlertIcon, Button, Box, CircularProgress} from '@chakra-ui/react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import arrow from '../assets/arrow.svg'
 
 function Resumes() {
   const [text, setText] = useState('')
-  const [prevText, setPrevText] = useState('')
+  const [employment, setEmployment] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
+  const [schedule, setSchedule] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
   const [resumes, setResumes] = useState([])
   const [stat, setStat] = useState('')
   const [count, setCount] = useState(0)
   const [prog, setProg] = useState(false);
   
-  function getResumes(count) {
-    fetch("http://127.0.0.1:8000/resumes?text="+text+"&count="+count, {
+  function getResumes(count, add) {
+    let url = "http://127.0.0.1:8000/resumes?text="+text+"&count="+count
+    let strEmp = ''
+    for (let item in employment) {
+      if (employment[item]) {
+        strEmp += item
+      }
+    }
+    if (strEmp.length !=0) {
+      url += "&employment="+strEmp
+    }
+    let strSch = ''
+    for (let item in schedule) {
+      if (schedule[item]) {
+        strSch += item
+      }
+    }
+    if (strSch.length !=0) {
+      url += "&schedule="+strSch
+    }
+    fetch(url, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -20,7 +40,7 @@ function Resumes() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (prevText == text) {
+        if (add) {
           const newRes = [...resumes, ...data]
           setResumes(newRes);
         } else {
@@ -37,21 +57,36 @@ function Resumes() {
         console.log(error)
         setStat('error')
       })
-    setPrevText(text);
   }
 
-  const handleKeyDown = event => {
-    if (event.key === 'Enter') {
-      setProg(true);
-      setCount(0);
-      getResumes(0);
-    }
-  };
+  function updateResumes() {
+    setProg(true);
+    setCount(0);
+    getResumes(0, false);
+  }
 
   function addResumes() {
     setProg(true);
     setCount(count+1)
-    getResumes(count+1);
+    getResumes(count+1, true);
+  }
+
+  const handleKeyDown = event => {
+    if (event.key === 'Enter') {
+      updateResumes();
+    }
+  };
+
+  function updateEmployment(value) {
+    let newEmployment = employment;
+    newEmployment[value] = !newEmployment[value];
+    setEmployment(newEmployment);
+  }
+
+  function updateSchedule(value) {
+    let newSchedule = schedule;
+    newSchedule[value] = !newSchedule[value];
+    setSchedule(newSchedule);
   }
 
   const resumesCards = resumes.map((res) => (
@@ -89,22 +124,56 @@ function Resumes() {
         <ChakraLink as={ReactRouterLink} to='/' fontSize='2xl' paddingRight='5rem'>Вакансии</ChakraLink>
         <ChakraLink as={ReactRouterLink} to='/resumes' fontSize='2xl' paddingRight='5rem'><Text color='blue.600' as='ins'>Резюме</Text></ChakraLink>
       </Flex>
-      <Flex direction='column' w="50vw">
-        <Flex direction='column' align='flex-start'>
-          <Flex align='center'>
-            <Image src={arrow} boxSize='1rem' margin='1rem 0 0 2rem'/>
-            <ChakraLink as={ReactRouterLink} to='/resumes/data' fontSize='l' marginTop='1rem'>База данныx по резюме</ChakraLink>
+      <Flex align='center'>
+        <Image src={arrow} boxSize='1rem' margin='1rem 0 0 2rem'/>
+        <ChakraLink as={ReactRouterLink} to='/resumes/data' fontSize='l' marginTop='1rem'>База данныx по резюме</ChakraLink>
+      </Flex>
+      <Flex>
+        <Flex direction='column' w="50vw">
+          <Flex direction='column' align='flex-start'>
+            <Input placeholder='Поиск по резюме' margin='1rem 0' onChange={e => setText(e.target.value)} onKeyDown={handleKeyDown}/>
           </Flex>
-          <Input placeholder='Поиск по резюме' margin='1rem 0' onChange={e => setText(e.target.value)} onKeyDown={handleKeyDown}/>
+          <Flex direction='column'>
+            {resumesCards}
+          </Flex>
+          {resumes.length!=0 ? 
+          <Button marginBottom='1rem' onClick={addResumes}>Найти ещё</Button>
+          : 
+          <></>
+          }
         </Flex>
-        <Flex direction='column'>
-          {resumesCards}
+        <Flex w='30vw' direction='column' justify='flex-start' padding='0 2rem' marginTop='1rem'>
+          <Card>
+            <CardHeader>
+              <Text fontSize='xl' align='left'>Фильтры</Text>
+            </CardHeader>
+            <CardBody textAlign='start' paddingTop='0'>
+              <Text>Занятость</Text>
+              <CheckboxGroup>
+                <Stack marginLeft='1rem' marginBottom="1rem">
+                  <Checkbox size='sm' onChange={() => updateEmployment('0')}>Полная занятость</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('1')}>Частичная занятость</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('2')}>Стажировка</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('3')}>Проектная работа</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateEmployment('4')}>Волонтерство</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+              <Text>График</Text>
+              <CheckboxGroup>
+                <Stack marginLeft='1rem' marginBottom="1rem">
+                  <Checkbox size='sm' onChange={() => updateSchedule('0')}>Полный день</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('1')}>Удаленная работа</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('2')}>Сменный график</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('3')}>Гибкий график</Checkbox>
+                  <Checkbox size='sm' onChange={() => updateSchedule('4')}>Вахтовый метод</Checkbox>
+                </Stack>
+              </CheckboxGroup>
+              <Flex>
+                <Button size='sm' onClick={updateResumes}>Показать результаты</Button>
+              </Flex>
+            </CardBody>
+          </Card>
         </Flex>
-        {resumes.length!=0 ? 
-        <Button marginBottom='1rem' onClick={addResumes}>Найти ещё</Button>
-        : 
-        <></>
-        }
       </Flex>
       {prog ?
         <CircularProgress isIndeterminate marginBottom='1rem' zIndex={2} pos="fixed" right='2rem' top='2rem'/>
