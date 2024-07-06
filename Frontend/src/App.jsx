@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Vacancies } from './pages/Vacancies'
 import { Resumes } from './pages/Resumes'
 import { VacanciesData } from './pages/VacanciesData'
