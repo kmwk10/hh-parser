@@ -70,12 +70,7 @@ def get_resume_links(text, emp, sch, page):
     if data.status_code != 200:
         return
     soup = BeautifulSoup(data.content, "lxml")
-    try:
-        number_of_page = int(soup.find("div", attrs={"class":"pager"}).find_all("span", recursive=False)[-1].find("a").find("span").text)
-    except:
-        return
-    if page > number_of_page:
-        return "Error"
+    
     try:
         data = requests.get(
             url=f"https://hh.ru/search/resume?text={text}&area=1&isDefaultArea=true&ored_clusters=true&order_by=relevance&search_period=0&logic=normal&pos=full_text&exp_period=all_time&page={page}&items_on_page=20"+params,
