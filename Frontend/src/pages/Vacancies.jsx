@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Checkbox, CheckboxGroup, Stack, Image, Tag, Alert, AlertIcon, Button, CircularProgress} from '@chakra-ui/react'
-import { Link as ReactRouterLink } from 'react-router-dom'
-import arrow from '../assets/arrow.svg'
+import { useEffect, useState, useCallback } from 'react';
+import { Flex, Input, Text, Link as ChakraLink, Card, CardHeader, CardBody, Checkbox, CheckboxGroup, Stack, Image, Tag, Alert, AlertIcon, Button, CircularProgress } from '@chakra-ui/react';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import arrow from '../assets/arrow.svg';
 
 function Vacancies() {
-  const [text, setText] = useState('')
-  const [employment, setEmployment] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
-  const [schedule, setSchedule] = useState({"0": false, "1": false, "2": false, "3": false, "4": false})
-  const [vacancies, setVacancies] = useState([])
-  const [stat, setStat] = useState('')
-  const [count, setCount] = useState(0)
+  const [text, setText] = useState('');
+  const [employment, setEmployment] = useState({ "0": false, "1": false, "2": false, "3": false, "4": false });
+  const [schedule, setSchedule] = useState({ "0": false, "1": false, "2": false, "3": false, "4": false });
+  const [vacancies, setVacancies] = useState([]);
+  const [stat, setStat] = useState('');
+  const [count, setCount] = useState(0);
   const [prog, setProg] = useState(false);
-  
+
   useEffect(() => {
     fetch("http://127.0.0.1:8000", {
       method: "GET",
@@ -22,27 +22,22 @@ function Vacancies() {
       .then((response) => response.json())
       .catch((error) => console.log(error));
   }, []);
-  
-  function getVacancies(count, add) {
-    let url = "http://127.0.0.1:8000/vacancies?text="+text+"&count="+count
-    let strEmp = ''
-    for (let item in employment) {
-      if (employment[item]) {
-        strEmp += item
-      }
-    }
-    if (strEmp.length !=0) {
-      url += "&employment="+strEmp
-    }
-    let strSch = ''
-    for (let item in schedule) {
-      if (schedule[item]) {
-        strSch += item
-      }
-    }
-    if (strSch.length !=0) {
-      url += "&schedule="+strSch
-    }
+
+  const buildFilterQuery = useCallback(() => {
+    let url = `http://127.0.0.1:8000/vacancies?text=${text}&count=${count}`;
+    
+    const strEmp = Object.keys(employment).filter(key => employment[key]).join('');
+    if (strEmp) url += `&employment=${strEmp}`;
+    
+    const strSch = Object.keys(schedule).filter(key => schedule[key]).join('');
+    if (strSch) url += `&schedule=${strSch}`;
+    
+    return url;
+  }, [text, count, employment, schedule]);
+
+  const getVacancies = useCallback((add) => {
+    setProg(true);
+    const url = buildFilterQuery();
     fetch(url, {
       method: "GET",
       headers: {
@@ -51,36 +46,26 @@ function Vacancies() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (add) {
-          const newVac = [...vacancies, ...data]
-          setVacancies(newVac);
-        } else {
-          setVacancies(data);
-        }
-        if (data.length == 0) {
-          setStat('nothing')
-        } else {
-          setStat('success')
-        }
+        setVacancies(prevVacancies => add ? [...prevVacancies, ...data] : data);
+        setStat(data.length === 0 ? 'nothing' : 'success');
         setProg(false);
       })
       .catch((error) => {
-        console.log(error)
-        setStat('error')
-      })
-  }
+        console.log(error);
+        setStat('error');
+        setProg(false);
+      });
+  }, [buildFilterQuery]);
 
-  function updateVacancies() {
-    setProg(true);
+  const updateVacancies = () => {
     setCount(0);
-    getVacancies(0, false);
-  }
+    getVacancies(false);
+  };
 
-  function addVacancies() {
-    setProg(true);
-    setCount(count+1)
-    getVacancies(count+1, true);
-  }
+  const addVacancies = () => {
+    setCount(count + 1);
+    getVacancies(true);
+  };
 
   const handleKeyDown = event => {
     if (event.key === 'Enter') {
@@ -88,22 +73,20 @@ function Vacancies() {
     }
   };
 
-  function updateEmployment(value) {
-    let newEmployment = employment;
-    newEmployment[value] = !newEmployment[value];
-    setEmployment(newEmployment);
-  }
+  const updateEmployment = (value) => {
+    setEmployment(prev => ({ ...prev, [value]: !prev[value] }));
+  };
 
-  function updateSchedule(value) {
-    let newSchedule = schedule;
-    newSchedule[value] = !newSchedule[value];
-    setSchedule(newSchedule);
-  }
+  const updateSchedule = (value) => {
+    setSchedule(prev => ({ ...prev, [value]: !prev[value] }));
+  };
 
   const vacanciesCards = vacancies.map((vac) => (
     <Card align='flex-start' w='100%' marginBottom='1rem' key={vac['id']}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/vacancy/'+vac["id"]} isExternal><Text fontSize='2xl' textAlign='left'>{vac["name"]}</Text></ChakraLink>
+        <ChakraLink href={`https://hh.ru/vacancy/${vac["id"]}`} isExternal>
+          <Text fontSize='2xl' textAlign='left'>{vac["name"]}</Text>
+        </ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
         <Text as='b'>{vac["salary"]}</Text>
@@ -134,12 +117,10 @@ function Vacancies() {
             <Input placeholder='Поиск по вакансиям' margin='1rem 0' onChange={e => setText(e.target.value)} onKeyDown={handleKeyDown}/>
           </Flex>
           <Flex direction='column'>
-              {vacanciesCards}
+            {vacanciesCards}
           </Flex>
-          {vacancies.length!=0 ? 
-          <Button marginBottom='1rem' onClick={addVacancies}>Найти ещё</Button>
-          : 
-          <></>
+          {vacancies.length !== 0 &&
+            <Button marginBottom='1rem' onClick={addVacancies}>Найти ещё</Button>
           }
         </Flex>
         <Flex w='30vw' direction='column' justify='flex-start' padding='0 2rem' marginTop='1rem'>
@@ -175,31 +156,26 @@ function Vacancies() {
           </Card>
         </Flex>
       </Flex>
-      {prog ?
+      {prog ? (
         <CircularProgress isIndeterminate marginBottom='1rem' zIndex={2} pos="fixed" right='2rem' top='2rem'/>
-      :
-      stat=='success' ? 
+      ) : stat === 'success' ? (
         <Alert status='success' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           Найденные вакансии загружены в базу данныx!
         </Alert>
-      :
-      stat=="error" ?
+      ) : stat === "error" ? (
         <Alert status='error' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           При обработке вашего запроса произошла ошибка!
         </Alert>
-      :
-      stat=="nothing" ?
+      ) : stat === "nothing" ? (
         <Alert status='info' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           По вашему запросу ничего не найдено!
         </Alert>
-      :
-        <></>
-      }
+      ) : null}
     </>
-  )
+  );
 }
-  
-export {Vacancies}
+
+export { Vacancies };

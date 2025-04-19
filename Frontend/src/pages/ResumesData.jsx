@@ -13,37 +13,27 @@ function ResumesData() {
   const [prog, setProg] = useState(false)
   const [stat, setStat] = useState('')
 
+  const buildQuery = () => {
+    let url = "http://127.0.0.1:8000/resumes/data?";
+    const params = new URLSearchParams();
+
+    if (name) params.append('name', name);
+    if (gender) params.append('gender', gender);
+
+    const empFilter = Object.keys(employment).filter(key => employment[key]).join('');
+    if (empFilter) params.append('employment', empFilter);
+
+    const schFilter = Object.keys(schedule).filter(key => schedule[key]).join('');
+    if (schFilter) params.append('schedule', schFilter);
+
+    if (skills) params.append('skills', skills);
+
+    return url + params.toString();
+  };
+
   function getResumesData() {
     setProg(true);
-    let url = "http://127.0.0.1:8000/resumes/data?"
-    if (name.length !=0) {
-      url += "name="+name+'&'
-    }
-    if (gender.length !=0) {
-      url += "gender="+gender+'&'
-    }
-    let strEmp = ''
-    for (let item in employment) {
-      if (employment[item]) {
-        strEmp += item
-      }
-    }
-    if (strEmp.length !=0) {
-      url += "employment="+strEmp+'&'
-    }
-    let strSch = ''
-    for (let item in schedule) {
-      if (schedule[item]) {
-        strSch += item
-      }
-    }
-    if (strSch.length !=0) {
-      url += "schedule="+strSch+'&'
-    }
-    if (skills.length !=0) {
-      url += "skills="+skills+'&'
-    }
-    fetch(url, {
+    fetch(buildQuery(), {
       method: "GET",
       headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -52,39 +42,34 @@ function ResumesData() {
       .then((response) => response.json())
       .then((data) => {
         setResData(data);
-        if (data.length == 0) {
-          setStat('nothing')
-        } else {
-          setStat('success')
-        }
+        setStat(data.length === 0 ? 'nothing' : 'success');
         setProg(false);
       })
       .catch((error) => {
-        console.log(error)
-        setStat('error')
-      })
+        console.log(error);
+        setStat('error');
+        setProg(false);
+      });
   }
 
   useEffect(() => {
     getResumesData();
-  }, [])
+  }, []);
 
   function updateEmployment(value) {
-    let newEmployment = employment;
-    newEmployment[value] = !newEmployment[value];
-    setEmployment(newEmployment);
+    setEmployment(prev => ({ ...prev, [value]: !prev[value] }));
   }
 
   function updateSchedule(value) {
-    let newSchedule = schedule;
-    newSchedule[value] = !newSchedule[value];
-    setSchedule(newSchedule);
+    setSchedule(prev => ({ ...prev, [value]: !prev[value] }));
   }
 
   const resDataCards = resData.map((res) => (
     <Card align='flex-start' w='100%' marginBottom='1rem' key={res['id']}>
       <CardHeader paddingBottom='0.5rem'>
-        <ChakraLink href={'https://hh.ru/resume/'+res['id']} isExternal><Text fontSize='2xl'>{res["name"]}</Text></ChakraLink>
+        <ChakraLink href={'https://hh.ru/resume/' + res['id']} isExternal>
+          <Text fontSize='2xl'>{res["name"]}</Text>
+        </ChakraLink>
       </CardHeader>
       <CardBody textAlign='start' paddingTop='0'>
         <Text as='b'>{res["salary"]}</Text>
@@ -94,13 +79,13 @@ function ResumesData() {
         <Text>{res["employment"][0].toUpperCase() + res["employment"].slice(1)}</Text>
         <Text>{res["schedule"][0].toUpperCase() + res["schedule"].slice(1)}</Text>
         <Box>
-          {res["skills"].length!=0 ? <Text>Навыки: </Text> : <></>}
+          {res["skills"].length ? <Text>Навыки: </Text> : null}
           {res["skills"].map((item) => (
             <Tag key={item} margin='0.2rem 1rem 0.2rem 0'>{item}</Tag>
           ))}
         </Box>
         <Box>
-          {res["languages"].length!=0 ? <Text>Знание языков: </Text> : <></>}
+          {res["languages"].length ? <Text>Знание языков: </Text> : null}
           {res["languages"].map((item) => (
             <Tag key={item} margin='0.2rem 1rem 0.2rem 0'>{item}</Tag>
           ))}
@@ -161,7 +146,7 @@ function ResumesData() {
                 </Stack>
               </CheckboxGroup>
               <Text>Навыки</Text>
-              <Input marginBottom='1rem' placeholder='Введите навыки через запятую'size='sm' onChange={e => setSkills(e.target.value)}/>
+              <Input marginBottom='1rem' placeholder='Введите навыки через запятую' size='sm' onChange={e => setSkills(e.target.value)}/>
               <Flex>
                 <Button size='sm' onClick={getResumesData}>Показать результаты</Button>
               </Flex>
@@ -169,22 +154,22 @@ function ResumesData() {
           </Card>
         </Flex>
       </Flex>
-      {prog ?
+      {prog ? 
         <CircularProgress isIndeterminate marginBottom='1rem' zIndex={2} pos="fixed" right='2rem' top='2rem'/>
       :
-      stat=='success' ? 
+      stat === 'success' ? 
         <Alert status='success' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           В базе данных найдено {resData.length} резюме!
         </Alert>
       :
-      stat=="error" ?
+      stat === "error" ? 
         <Alert status='error' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           При обработке вашего запроса произошла ошибка!
         </Alert>
       :
-      stat=="nothing" ?
+      stat === "nothing" ? 
         <Alert status='info' zIndex={2} pos="fixed" w='auto' right='2rem' top='2rem'>
           <AlertIcon />
           По вашему запросу ничего не найдено!
@@ -193,7 +178,7 @@ function ResumesData() {
         <></>
       }
     </>
-  )
+  );
 }
-  
-export {ResumesData}
+
+export { ResumesData }
